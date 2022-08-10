@@ -31,6 +31,9 @@ import {
 
 import css from './App.css';
 
+import NewPost from './Component/NewPost';
+import Post from './Component/Post';
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -81,6 +84,25 @@ const DrawerHeader = styled('div')(({ theme }) => ({
  function App() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [posts, setPosts] = React.useState([1,2,3]);
+  
+
+  async function getPosts(){
+    const postlist = await (await fetch("http://localhost:3001/GetPostList")).json();
+
+    setPosts(postlist);
+  }
+
+
+  React.useEffect(()=>{
+    getPosts();
+  },[]);
+
+
+
+
+
+
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -106,7 +128,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Persistent drawer
+            Goongam Blog
           </Typography>
         </Toolbar>
       </AppBar>
@@ -130,7 +152,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {['NewPost', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
             
               <Link to={`/${text}`} key={index}>
               <ListItem key={text} disablePadding>
@@ -148,15 +170,17 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
+          {posts.map((post, index) => (
+            <Link to={`/post/${post.ID}`} key={index}>
+              <ListItem key={index} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={post.TITLE} />
+                </ListItemButton>
+              </ListItem>
+            </Link>
           ))}
         </List>
       </Drawer>
@@ -167,7 +191,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/Inbox' element={<Home />} />
+            <Route path='/NewPost' element={<NewPost getPosts={getPosts} />} />
+            <Route path='/post/:postid' element={<Post getPosts={getPosts} />}></Route>
           </Routes>
         
        
