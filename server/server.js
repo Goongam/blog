@@ -46,7 +46,7 @@ async function insertArticle(title, content){
         return {"msg":"INSERT ERROR"}
     }
 }
-
+//
 async function getArticles(){
     try {
         const articleList = await connection.execute("select id,title,content,editdate from Articles");
