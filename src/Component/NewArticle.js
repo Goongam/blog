@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function NewPost({getPosts}){
+export default function NewArticle({getArticles}){
 
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
@@ -11,7 +11,7 @@ export default function NewPost({getPosts}){
         // console.log(title);
         // console.log(content);
 
-       let json = await (await fetch("http://localhost:3001/NewPost", {
+       let json = await (await fetch("http://localhost:3001/NewArticle", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -24,7 +24,7 @@ export default function NewPost({getPosts}){
           })).json();
 
         console.log(json);
-        getPosts();
+        getArticles();
     }
 
     return (

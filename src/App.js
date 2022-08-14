@@ -31,8 +31,9 @@ import {
 
 import css from './App.css';
 
-import NewPost from './Component/NewPost';
-import Post from './Component/Post';
+import NewArticle from './Component/NewArticle';
+import Article from './Component/Article';
+import ArticleList from './Component/ArticleList';
 
 const drawerWidth = 240;
 
@@ -84,22 +85,25 @@ const DrawerHeader = styled('div')(({ theme }) => ({
  function App() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [posts, setPosts] = React.useState([1,2,3]);
+  const [articles, setArticles] = React.useState([1,2,3]);
   
 
-  async function getPosts(){
-    const postlist = await (await fetch("http://localhost:3001/GetPostList")).json();
+  async function getArticles(){
+    const articlelist = await (await fetch("http://localhost:3001/GetArticleList")).json();
 
-    setPosts(postlist);
+    setArticles(articlelist);
   }
 
 
   React.useEffect(()=>{
-    getPosts();
+    getArticles();
   },[]);
 
 
-
+  const functionList = [
+    {"name":'글 쓰기', 'link':'NewArticle'},
+    {'name':'글 목록', 'link':'ArticleList'}
+  ];
 
 
 
@@ -152,16 +156,16 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </DrawerHeader>
         <Divider />
         <List>
-          {['NewPost', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
+          {functionList.map((func, index) => (
             
-              <Link to={`/${text}`} key={index}>
-              <ListItem key={text} disablePadding>
+              <Link to={`/${func.link}`} key={index}>
+              <ListItem key={func.name} disablePadding>
                 
                 <ListItemButton>
                   <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon>
-                  <ListItemText primary={text} />
+                  <ListItemText primary={func.name} />
                 </ListItemButton>
                 
               </ListItem>
@@ -170,14 +174,14 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </List>
         <Divider />
         <List>
-          {posts.map((post, index) => (
-            <Link to={`/post/${post.ID}`} key={index}>
+          {articles.map((article, index) => (
+            <Link to={`/article/${article.ID}`} key={index}>
               <ListItem key={index} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon>
-                  <ListItemText primary={post.TITLE} />
+                  <ListItemText primary={article.TITLE} />
                 </ListItemButton>
               </ListItem>
             </Link>
@@ -191,8 +195,9 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/NewPost' element={<NewPost getPosts={getPosts} />} />
-            <Route path='/post/:postid' element={<Post getPosts={getPosts} />}></Route>
+            <Route path='/NewArticle' element={<NewArticle getArticles={getArticles} />} />
+            <Route path='/article/:articleid' element={<Article getArticles={getArticles} />}></Route>
+            <Route path='/ArticleList' element={<ArticleList/>} />
           </Routes>
         
        
