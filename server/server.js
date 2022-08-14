@@ -28,15 +28,17 @@ async function connectDB(){
     
     
 //     // let query = await connection.execute("select id from MapleIdList where nickname = :nick",["앙꼬뽀리"]);
-//     let query = await connection.execute("select * from Posts");
+//     let query = await connection.execute("select * from Articles");
 //     console.log(query.rows[0].ID);
 
 //     res.send("aa");
 // });
+const today = new Date(); 
 
-async function insertPost(title, content){
+async function insertArticle(title, content){
     try {
-        await connection.execute("insert into Posts values(postid_seq.NEXTVAL,:title,:content)",[title,content]);
+        let editdate = today.getFullYear() + "/"+ today.getMonth()+"/"+ today.getDate(); 
+        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,:editdate)",[title,content,editdate]);
         connection.commit();
         return {"msg":"insert success"};
     } catch (error) {
@@ -45,10 +47,10 @@ async function insertPost(title, content){
     }
 }
 
-async function getPosts(){
+async function getArticles(){
     try {
-        const postList = await connection.execute("select id,title from Posts");
-        return postList.rows;
+        const articleList = await connection.execute("select id,title,content,editdate from Articles");
+        return articleList.rows;
 
     } catch (error) {
         console.log(error);
@@ -56,25 +58,25 @@ async function getPosts(){
     }
 }
 
-async function getPostContent(id){
+async function getArticleContent(id){
     try {
-        const postContent = await connection.execute(
-            "select title,content from Posts where id = :id",[id]
+        const articleContent = await connection.execute(
+            "select title,content from Articles where id = :id",[id]
         );
         
-        if(postContent.rows.length === 0) return {"msg" : "No Post"};
+        if(articleContent.rows.length === 0) return {"msg" : "No Article"};
 
-        return postContent.rows[0];
+        return articleContent.rows[0];
     } catch (error) {
         console.log(error);
         return {"msg" : "SELECT Error2"};
     }
 }
 
-async function deletePost(id){
+async function deleteArticle(id){
     try {
         const result = await connection.execute(
-            "delete from Posts where id = :id",[id]
+            "delete from Articles where id = :id",[id]
         );
         connection.commit();
 
@@ -88,26 +90,26 @@ async function deletePost(id){
 }
 
 
-app.post('/NewPost',async (req,res)=>{
-   const msg = await insertPost(req.body.title, req.body.content);
+app.post('/NewArticle',async (req,res)=>{
+   const msg = await insertArticle(req.body.title, req.body.content);
 
    console.log(msg);
    res.send(msg);
 });
 
-app.get('/GetPostList',async (req,res)=>{
-    const result =  await getPosts();
+app.get('/GetArticleList',async (req,res)=>{
+    const result =  await getArticles();
     res.send(result);
 });
 
-app.get('/GetPostContent/:id',async (req,res)=>{
-   const result = await getPostContent(req.params.id);
+app.get('/GetArticleContent/:id',async (req,res)=>{
+   const result = await getArticleContent(req.params.id);
    
    res.send(result);
 });
 
-app.get('/deletePost/:id',async (req,res)=>{
-   const result = await deletePost(req.params.id);
+app.get('/deleteArticle/:id',async (req,res)=>{
+   const result = await deleteArticle(req.params.id);
    res.send(result);
  });
 
