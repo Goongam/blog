@@ -20,6 +20,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import TextField from '@mui/material/TextField';
 
 import Home from './Component/Home';
 import {
@@ -34,6 +35,7 @@ import css from './App.css';
 import NewArticle from './Component/NewArticle';
 import Article from './Component/Article';
 import ArticleList from './Component/ArticleList';
+import ArticlesOfCategory from './Component/ArticlesOfCategory';
 
 const drawerWidth = 240;
 
@@ -85,18 +87,35 @@ const DrawerHeader = styled('div')(({ theme }) => ({
  function App() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const [articles, setArticles] = React.useState([1,2,3]);
-  
+  const [articles, setArticles] = React.useState([]);
+  const [isCateInput, setIsCateInput] = React.useState(false);
+  const [categorys, setCategorys] = React.useState([]);
 
-  async function getArticles(){
-    const articlelist = await (await fetch("http://localhost:3001/GetArticleList")).json();
+  // async function getArticles(){
+  //   const articlelist = await (await fetch("http://localhost:3001/GetArticleList")).json();
 
-    setArticles(articlelist);
+  //   setArticles(articlelist);
+  // }
+  async function getCategory(){
+    const categoryList = await (await fetch("http://localhost:3001/GetCategoryList")).json();
+    setCategorys(categoryList);
   }
 
+  function addCategoryClickEvent(e){
+    if(e.key === "Enter" && e.target.value !== ""){
+      addCategory(e.target.value);
+    }
+  
+  }
+  async function addCategory(value){
+    const message = await (await fetch(`http://localhost:3001/newCategory/${value}`)).json();
+    setIsCateInput(false);
+    getCategory();
+  }
 
   React.useEffect(()=>{
-    getArticles();
+    // getArticles();
+    getCategory();
   },[]);
 
 
@@ -174,18 +193,34 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </List>
         <Divider />
         <List>
-          {articles.map((article, index) => (
-            <Link to={`/article/${article.ID}`} key={index}>
+          {categorys.map((category, index) => (
+            <Link to={`/category/${category.CATEGORY}`} key={index}>
               <ListItem key={index} disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                   </ListItemIcon>
-                  <ListItemText primary={article.TITLE} />
+                  <ListItemText primary={category.CATEGORY} />
                 </ListItemButton>
               </ListItem>
-            </Link>
+             </Link>
           ))}
+          <ListItem>
+            {
+              isCateInput ? 
+                <TextField 
+                  inputRef={input => {console.log(input); return input && input.focus();}} 
+                  onBlur={()=>{setIsCateInput(false)}}
+                  onKeyDown={addCategoryClickEvent}
+                  id="standard-basic" label="카테고리 입력" variant="standard" /> 
+                :
+                <ListItemButton onClick={()=>{setIsCateInput(true);}}>
+                  카테고리추가...
+                </ListItemButton> 
+            }
+            
+
+          </ListItem>
         </List>
       </Drawer>
       <Main open={open}>
@@ -195,9 +230,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/NewArticle' element={<NewArticle getArticles={getArticles} />} />
-            <Route path='/article/:articleid' element={<Article getArticles={getArticles} />}></Route>
+            <Route path='/NewArticle' element={<NewArticle categoryList={categorys} addCategory={addCategory} />} />
+            <Route path='/article/:articleid' element={<Article />}></Route>
             <Route path='/ArticleList' element={<ArticleList/>} />
+            <Route path='/Category/:category' element={<ArticlesOfCategory />} />
           </Routes>
         
        

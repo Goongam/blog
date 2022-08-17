@@ -35,10 +35,10 @@ async function connectDB(){
 // });
 const today = new Date(); 
 
-async function insertArticle(title, content){
+async function insertArticle(title, content,category){
     try {
         let editdate = today.getFullYear() + "/"+ today.getMonth()+"/"+ today.getDate(); 
-        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,:editdate)",[title,content,editdate]);
+        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,:editdate, :category)",[title,content,editdate,category]);
         connection.commit();
         return {"msg":"insert success"};
     } catch (error) {
@@ -52,6 +52,16 @@ async function getArticles(){
         const articleList = await connection.execute("select id,title,content,editdate from Articles");
         return articleList.rows;
 
+    } catch (error) {
+        console.log(error);
+        return {"msg" : "SELECT Error"};
+    }
+}
+
+async function getCategoryList(){
+    try {
+        const categoryList = await connection.execute("select category from Categorys");
+        return categoryList.rows;
     } catch (error) {
         console.log(error);
         return {"msg" : "SELECT Error"};
@@ -73,6 +83,17 @@ async function getArticleContent(id){
     }
 }
 
+async function getCategoryArticle(category){
+    try {
+        const articleList = await connection.execute('select * from Articles where category = :category',[category]);
+
+        return articleList.rows;
+    } catch (error) {
+        console.log(error);
+        return {"msg" : "SELECT Error3"};
+    }
+}
+
 async function deleteArticle(id){
     try {
         const result = await connection.execute(
@@ -89,9 +110,18 @@ async function deleteArticle(id){
     }
 }
 
+async function addCategory(category){
+    try {
+        connection.execute("insert into Categorys values(:category)",[category]);
+        connection.commit();
+        return {"msg":"insert success"};
+    } catch (error) {
+        return {"msg":"insert ERROR"};
+    }
+}
 
 app.post('/NewArticle',async (req,res)=>{
-   const msg = await insertArticle(req.body.title, req.body.content);
+   const msg = await insertArticle(req.body.title, req.body.content, req.body.category);
 
    console.log(msg);
    res.send(msg);
@@ -101,6 +131,11 @@ app.get('/GetArticleList',async (req,res)=>{
     const result =  await getArticles();
     res.send(result);
 });
+app.get('/GetCategoryList', async (req,res)=>{
+    const result = await getCategoryList();
+    res.send(result);
+});
+
 
 app.get('/GetArticleContent/:id',async (req,res)=>{
    const result = await getArticleContent(req.params.id);
@@ -112,6 +147,16 @@ app.get('/deleteArticle/:id',async (req,res)=>{
    const result = await deleteArticle(req.params.id);
    res.send(result);
  });
+
+app.get('/newCategory/:category',async (req,res)=>{
+    const result = await addCategory(req.params.category);
+    res.send(result);
+});
+
+app.get('/Category/:category',async (req,res)=>{
+    const result = await getCategoryArticle(req.params.category);
+    res.send(result);
+});
 
 app.listen(3001, function(){
     console.log("start!!");
