@@ -1,11 +1,11 @@
 import { Box, Button, Card, CardActions, CardContent, Divider, ListItem, ListItemText, Typography } from '@mui/material';
 import List from '@mui/material/List';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
-export default function ArticleList(){
+function ArticleList(){
 
     const [articles , setArticles] = useState([]);
-
+    console.log('ArticleList render');
     async function getArticles(){
         const articlelist = await (await fetch("http://localhost:3001/GetArticleList")).json();
     
@@ -61,3 +61,5 @@ export default function ArticleList(){
         </>
     );
 }
+
+export default memo(ArticleList);

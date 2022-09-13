@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-export default function ArticlesOfCategory(){
+function ArticlesOfCategory(){
     const category = useParams().category;
 
     const [articleList, setArticleList] = useState([]);
@@ -44,3 +44,5 @@ export default function ArticlesOfCategory(){
         </>
     );
 }
+
+export default memo(ArticlesOfCategory);

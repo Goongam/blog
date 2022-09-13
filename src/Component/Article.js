@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-export default function Article({getArticles}){
+function Article({getArticles}){
 
     const articleid = useParams().articleid;
     const Nevigate = useNavigate();
@@ -43,3 +43,5 @@ export default function Article({getArticles}){
         </>
         );
 }
+
+export default memo(Article);

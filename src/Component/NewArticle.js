@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -6,11 +6,12 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-export default function NewArticle({categoryList, addCategory}){
+function NewArticle({categoryList, addCategory}){
 
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
     const [selectedCate, setSelectedCate] = useState("");
+    console.log('newArticle render');
   //   const [dialogopen, setDialogOpen] = useState(false);
   //   const [inputCategory, setinputCategory] = useState('');
 
@@ -78,3 +79,5 @@ export default function NewArticle({categoryList, addCategory}){
         </>
     );
 }
+
+export default memo(NewArticle);

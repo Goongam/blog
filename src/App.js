@@ -107,11 +107,13 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     }
   
   }
-  async function addCategory(value){
+
+  const addCategory = React.useCallback(async (value)=>{
     const message = await (await fetch(`http://localhost:3001/newCategory/${value}`)).json();
     setIsCateInput(false);
     getCategory();
-  }
+  },[]);
+ 
 
   React.useEffect(()=>{
     // getArticles();
@@ -135,6 +137,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
     setOpen(false);
   };
 
+  const categoryMemo = React.useMemo(()=> [...categorys], [categorys]);
+  console.log('App render')
   return (
     <Box sx={{ display: 'flex' }}>
       <Router>
@@ -230,7 +234,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/NewArticle' element={<NewArticle categoryList={categorys} addCategory={addCategory} />} />
+            <Route path='/NewArticle' element={<NewArticle categoryList={categoryMemo} addCategory={addCategory} />} />
             <Route path='/article/:articleid' element={<Article />}></Route>
             <Route path='/ArticleList' element={<ArticleList/>} />
             <Route path='/Category/:category' element={<ArticlesOfCategory />} />

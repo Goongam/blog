@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 function Home(){
 
     return (
@@ -7,4 +9,4 @@ function Home(){
     );
 }
 
-export default Home;
+export default memo(Home);
