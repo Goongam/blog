@@ -86,7 +86,7 @@ async function getArticleContent(id){
 async function getCategoryArticle(category){
     try {
         const articleList = await connection.execute('select * from Articles where category = :category',[category]);
-
+        // console.log(articleList.rows);
         return articleList.rows;
     } catch (error) {
         console.log(error);

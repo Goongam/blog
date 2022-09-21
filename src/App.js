@@ -30,12 +30,24 @@ import {
   Link
 } from "react-router-dom";
 
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClientProvider,
+  QueryClient,
+} from 'react-query'
+
 import css from './App.css';
 
 import NewArticle from './Component/NewArticle';
 import Article from './Component/Article';
 import ArticleList from './Component/ArticleList';
 import ArticlesOfCategory from './Component/ArticlesOfCategory';
+
+
+const queryClient = new QueryClient();
+
 
 const drawerWidth = 240;
 
@@ -140,6 +152,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   const categoryMemo = React.useMemo(()=> [...categorys], [categorys]);
   console.log('App render')
   return (
+    <QueryClientProvider client={queryClient}>
     <Box sx={{ display: 'flex' }}>
       <Router>
       <CssBaseline />
@@ -235,8 +248,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/NewArticle' element={<NewArticle categoryList={categoryMemo} addCategory={addCategory} />} />
-            <Route path='/article/:articleid' element={<Article />}></Route>
-            <Route path='/ArticleList' element={<ArticleList/>} />
+            <Route path='/article/:articleid' element={<Article />} />
+            <Route path='/ArticleList' element={<ArticleList />} />
             <Route path='/Category/:category' element={<ArticlesOfCategory />} />
           </Routes>
         
@@ -245,7 +258,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
       </Main>
       </Router>
     </Box>
-    
+    </QueryClientProvider>
   );
 }
 export default App;

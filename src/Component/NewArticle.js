@@ -80,4 +80,4 @@ function NewArticle({categoryList, addCategory}){
     );
 }
 
-export default memo(NewArticle);
+export default NewArticle;

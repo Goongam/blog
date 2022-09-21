@@ -1,47 +1,58 @@
-import { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo } from "react";
+import { useMutation, useQuery } from "react-query";
 import { useParams, useNavigate } from "react-router-dom";
 
-function Article({getArticles}){
+function Article(){
 
     const articleid = useParams().articleid;
     const Nevigate = useNavigate();
 
-    const [articleTitle, setArticleTitle] = useState("");
-    const [articleContent, setArticleContent] = useState("");
-    const [msg, setMsg] = useState("");
+
+    const {data,isError,isLoading} = useQuery(['article',articleid],
+                                async ()=> await (await fetch(`http://localhost:3001/GetArticleContent/${articleid}`)).json(),
+                                {
+                                    staleTime: 0, //fetch쿨타임 시간(ms)
+                                    onSuccess: async(d)=>{
+                                        console.log("성공");
+                        
+                                    },
+                                    onError:(error)=>{
+                                        console.log("에러코드:"+error.response?.data.code);
+                                    },
+                                    // enabled: false //true상태일때만 실행
+                                    retry: 3, //재시도횟수
+                                    refetchOnMount: true, //쿨타임끝일때 자동 마운팅
+                                    refetchOnWindowFocus: false, //쿨타임끝일때 윈도우 포커스 잡힐경우 자동 마운팅
+                        
+                                });
 
 
-    
-    useEffect(()=>{
-        async function getArticleContent(){
-            const article = await (await fetch(`http://localhost:3001/GetArticleContent/${articleid}`)).json();
-            
-            
-            setMsg(article?.msg);
-            setArticleTitle(article.TITLE);
-            setArticleContent(article.CONTENT);
+
+
+    const deleteArticle = useMutation(async(id)=>{await fetch(`http://localhost:3001/deleteArticle/${id}`)},{
+        onSuccess:()=>{
+            console.log('삭제성공');
+            Nevigate('/');
+        },
+        onError:()=>{
+            console.log('삭제에러');
         }
-        getArticleContent();
-    },[articleid]);
-
-    async function deleteArticle(){
-        await fetch(`http://localhost:3001/deleteArticle/${articleid}`);
-        getArticles();
-        Nevigate('/');
-    }
+    });
 
     return (
         <>
             {
-            msg === "No Article"? "NO POST":
+            isLoading? "Loading...":
+            isError? '서버와 연결할 수 없음':
+            data.msg === 'No Article'? 'NO POST':
                 <div>
-                    <p>{articleTitle}</p>
-                    <p>{articleContent}</p>
-                    <button onClick={deleteArticle}>글 삭제</button>
+                    <p>{data.TITLE}</p>
+                    <p>{data.CONTENT}</p>
+                    <button onClick={()=>{deleteArticle.mutate(articleid)}}>글 삭제</button>
                 </div>
             }
         </>
         );
 }
 
-export default memo(Article);
+export default Article;
