@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { useMutation } from "react-query";
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
-function NewArticle({categoryList, addCategory}){
+function NewArticle({categoryList}){
 
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
@@ -29,7 +29,6 @@ function NewArticle({categoryList, addCategory}){
       onError: ()=>{console.log('삭제실패')}
     })
 
-    console.log(createArticle.data);
 
     return (
         <>
