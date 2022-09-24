@@ -33,12 +33,11 @@ async function connectDB(){
 
 //     res.send("aa");
 // });
-const today = new Date(); 
 
 async function insertArticle(title, content,category){
     try {
-        let editdate = today.getFullYear() + "/"+ today.getMonth()+"/"+ today.getDate(); 
-        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,:editdate, :category)",[title,content,editdate,category]);
+
+        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,to_timestamp(to_char(SYSDATE,'YYYY-MM-DD HH24:MI:SS')), :category)",[title,content,category]);
         connection.commit();
         return {"msg":"insert success"};
     } catch (error) {
@@ -49,7 +48,8 @@ async function insertArticle(title, content,category){
 //
 async function getArticles(){
     try {
-        const articleList = await connection.execute("select id,title,content,editdate from Articles");
+        const articleList = await connection.execute("select id,title,content,editdate from Articles order by editdate desc");
+        console.log(articleList.rows);
         return articleList.rows;
 
     } catch (error) {
@@ -112,7 +112,7 @@ async function deleteArticle(id){
 
 async function addCategory(category){
     try {
-        connection.execute("insert into Categorys values(:category)",[category]);
+        connection.execute("insert into Categorys values(category_seq.nextval, :category)",[category]);
         connection.commit();
         return {"msg":"insert success"};
     } catch (error) {

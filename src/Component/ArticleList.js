@@ -14,10 +14,9 @@ function ArticleList(){
             staleTime: 0, //fetch쿨타임 시간(ms)
             onSuccess: async(d)=>{
                 console.log("성공");
-
             },
             onError:(error)=>{
-                console.log("에러코드:"+error.response?.data.code);
+                console.log("에러:"+error);
             },
             // enabled: false //true상태일때만 실행
             retry: 3, //재시도횟수
