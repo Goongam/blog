@@ -36,25 +36,25 @@ async function connectDB(){
 
 async function insertArticle(title, content,category){
     try {
-
-        await connection.execute("insert into Articles values(articleid_seq.NEXTVAL,:title,:content,to_timestamp(to_char(SYSDATE,'YYYY-MM-DD HH24:MI:SS')), :category)",[title,content,category]);
+        const nextval = await connection.execute('select articleid_seq.NEXTVAL from dual');
+        console.log("n:",nextval.rows[0].NEXTVAL);
+        await connection.execute("insert into Articles values(:id,:title,:content,to_timestamp(to_char(SYSDATE,'YYYY-MM-DD HH24:MI:SS')), :category)",[nextval.rows[0].NEXTVAL,title,content,category]);
         connection.commit();
-        return {"msg":"insert success"};
+        return {"id":nextval.rows[0].NEXTVAL};
     } catch (error) {
-        console.log(error)
-        return {"msg":"INSERT ERROR"}
+        console.log('insertArticle ',error)
+        return {"error":"INSERT ERROR"}
     }
 }
 //
 async function getArticles(){
     try {
         const articleList = await connection.execute("select id,title,content,editdate from Articles order by editdate desc");
-        console.log(articleList.rows);
         return articleList.rows;
 
     } catch (error) {
-        console.log(error);
-        return {"msg" : "SELECT Error"};
+        console.log('getArticles ',error);
+        return {"error" : "SELECT Error"};
     }
 }
 
@@ -63,8 +63,8 @@ async function getCategoryList(){
         const categoryList = await connection.execute("select category from Categorys");
         return categoryList.rows;
     } catch (error) {
-        console.log(error);
-        return {"msg" : "SELECT Error"};
+        console.log('getCategoryList ',error);
+        return {"error" : "SELECT Error"};
     }
 }
 
@@ -78,8 +78,8 @@ async function getArticleContent(id){
 
         return articleContent.rows[0];
     } catch (error) {
-        console.log(error);
-        return {"msg" : "SELECT Error2"};
+        console.log('getArticleContent ',error);
+        return {"error" : "SELECT Error2"};
     }
 }
 
@@ -89,8 +89,8 @@ async function getCategoryArticle(category){
         // console.log(articleList.rows);
         return articleList.rows;
     } catch (error) {
-        console.log(error);
-        return {"msg" : "SELECT Error3"};
+        console.log('getCategoryArticle ',error);
+        return {"error" : "SELECT Error3"};
     }
 }
 
@@ -100,23 +100,21 @@ async function deleteArticle(id){
             "delete from Articles where id = :id",[id]
         );
         connection.commit();
-
-        console.log(result);
-
         return {"msg" : "DELETE success"}
     } catch (error) {
-        console.log(error);
-        return {"msg" : "DELETE ERROR"};
+        console.error('deleteArticle ',error);
+        return {"error" : "DELETE ERROR"};
     }
 }
 
 async function addCategory(category){
     try {
-        connection.execute("insert into Categorys values(category_seq.nextval, :category)",[category]);
-        connection.commit();
+        await connection.execute("insert into Categorys values(category_seq.nextval, :category)",[category]);
+        await connection.commit();
         return {"msg":"insert success"};
     } catch (error) {
-        return {"msg":"insert ERROR"};
+        console.error('addCategory ',error);
+        return {"error":"insert ERROR"};
     }
 }
 

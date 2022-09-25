@@ -1,11 +1,12 @@
-import { Box, Button, Card, CardActions, CardContent, Divider, ListItem, ListItemText, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Divider, ListItem, ListItemText, Typography, Link, ListItemButton } from '@mui/material';
 import List from '@mui/material/List';
 import { useState, useEffect, memo } from 'react';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 
 function ArticleList(){
 
-
+    const navigater = useNavigate();
     
 
    const {data, isError, isLoading, refetch} = useQuery('articlelist',
@@ -37,11 +38,13 @@ function ArticleList(){
                 <button onClick={()=>{refetch()}}>새로고침</button>
             {data.map(
                 (article, index)=>
-                    <div key={index}>
+                    <div key={index}>          
                         <ListItem key={index}>
+                        
                             {/* <ListItemText primary={article.TITLE} /> */}
                             <Card sx={{ minWidth: 1/1, p:0, m:0 }}>
-                                <CardContent>
+                            <ListItemButton onClick={()=>{navigater(`/Article/${article.ID}`)}}>
+                                <CardContent sx={{ minWidth: 1/1, p:0, m:0 }}>
                                     <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                                         
                                     </Typography>
@@ -50,12 +53,12 @@ function ArticleList(){
                                     </Typography>
 
                                     <Box sx={{ display: 'grid', gridAutoColumns: '1fr' }}>
-                                    <Typography sx={{gridRow:'1', gridColumn:'1/10'}} color="text.secondary">
-                                        {article.CONTENT.length < 30 ? 
-                                            article.CONTENT : 
-                                            article.CONTENT.substr(0,28)+"..."
-                                        }
-                                    </Typography>
+                                        <Typography sx={{gridRow:'1', gridColumn:'1/10'}} color="text.secondary">
+                                            {article.CONTENT.length < 30 ? 
+                                                article.CONTENT : 
+                                                article.CONTENT.substr(0,28)+"..."
+                                            }
+                                        </Typography>
                                         <Box color="text.secondary" sx={{gridRow:'2', gridColumn:'9/10'}}>
                                             {article.EDITDATE.substr(0, article.EDITDATE.length - 14)}
                                         </Box>
@@ -65,9 +68,10 @@ function ArticleList(){
                                 {/* <CardActions>
                                     <Button size="small">Learn More</Button>
                                 </CardActions> */}
+                                </ListItemButton>
                             </Card>
+                            
                         </ListItem>
-                        
                         {/* <Divider /> */}
                     </div>
                 

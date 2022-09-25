@@ -5,9 +5,12 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 function NewArticle({categoryList}){
+
+    const Nevigate = useNavigate();
 
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
@@ -25,8 +28,11 @@ function NewArticle({categoryList}){
       }),
       
     })).json(),{
-      onSuccess: ()=>{console.log("생성성공")},
-      onError: ()=>{console.log('삭제실패')}
+      onSuccess: (e)=>{
+        console.log("생성성공");
+        Nevigate(`/Article/${e.id}`);
+      },
+      onError: ()=>{console.log('생성실패')}
     })
 
 
