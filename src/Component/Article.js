@@ -48,6 +48,7 @@ function Article(){
                 <div>
                     <p>{data.TITLE}</p>
                     <p>{data.CONTENT}</p>
+                    <p>카테고리:{data.CATEGORY === null ? "(카테고리 없음)" : data.CATEGORY}</p>
                     <button onClick={()=>{deleteArticle.mutate(articleid)}}>글 삭제</button>
                 </div>
             }

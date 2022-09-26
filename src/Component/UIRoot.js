@@ -265,7 +265,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
             <Route path='/NewArticle' element={<NewArticle categoryList={catelistQuery.data} />} />
             <Route path='/article/:articleid' element={<Article />} />
             <Route path='/ArticleList' element={<ArticleList />} />
-            <Route path='/Category/:category' element={<ArticlesOfCategory />} />
+            <Route path='/Category/:category' element={<ArticlesOfCategory categoryRefetch={catelistQuery.refetch}/>} />
           </Routes>
         
        

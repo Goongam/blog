@@ -71,9 +71,8 @@ async function getCategoryList(){
 async function getArticleContent(id){
     try {
         const articleContent = await connection.execute(
-            "select title,content from Articles where id = :id",[id]
+            "select title,content,category from Articles where id = :id",[id]
         );
-        
         if(articleContent.rows.length === 0) return {"msg" : "No Article"};
 
         return articleContent.rows[0];
@@ -118,6 +117,19 @@ async function addCategory(category){
     }
 }
 
+async function deleteCategory(category){
+    try {
+        const a = await connection.execute('update articles SET category = null where category = :category',[category]);
+        await connection.execute('delete categorys where category = :category',[category]);
+        await connection.commit();
+        console.log(category);
+        return {"msg":"delete success"};
+    } catch (error) {
+        console.error('deleteCategory',error);
+        return {'error':'delete error'};
+    }
+}
+
 app.post('/NewArticle',async (req,res)=>{
    const msg = await insertArticle(req.body.title, req.body.content, req.body.category);
 
@@ -155,6 +167,11 @@ app.get('/Category/:category',async (req,res)=>{
     const result = await getCategoryArticle(req.params.category);
     res.send(result);
 });
+
+app.get('/deleteCategory/:category', async (req, res)=>{
+    const result = await deleteCategory(req.params.category);
+    res.send(result)
+})
 
 app.listen(3001, function(){
     console.log("start!!");

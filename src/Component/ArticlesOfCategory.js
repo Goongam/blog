@@ -1,11 +1,11 @@
 import { memo, useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useParams } from "react-router-dom";
+import { useMutation, useQuery } from "react-query";
+import { useNavigate, useParams } from "react-router-dom";
 
-function ArticlesOfCategory(){
+function ArticlesOfCategory({categoryRefetch}){
 
     const category = useParams().category;
-
+    const navigater = useNavigate();
     const {data, isError, isLoading, refetch} = 
         useQuery(['category',category],
             async()=> await(await fetch(`http://localhost:3001/Category/${category}`)).json() ,
@@ -22,17 +22,36 @@ function ArticlesOfCategory(){
                 refetchOnMount: true, //쿨타임끝일때 자동 마운팅
                 refetchOnWindowFocus: false, //쿨타임끝일때 윈도우 포커스 잡힐경우 자동 마운팅
             });
+    const deleteCategory = useMutation( async ()=>(await fetch(`http://localhost:3001/deleteCategory/${category}`)).json(),{
+        onSuccess: ()=>{console.log('삭제성공'); categoryRefetch(); navigater('/');},
+        onError: ()=>{console.log('삭제실패')}
+    } );
+    function deleteEvent(){
+        deleteCategory.mutate();
+
+    }
 
     return (
         <>
             {
             isError ? "서버와 연결할 수 없음" :
             isLoading ? "Loading...":
-                data.map((article,index) => 
-                    <div key={index}>
-                        {article.TITLE} / {article.CONTENT} / {article.CATEGORY}
+                (
+                    <div>
+                        <button onClick={deleteEvent}>이 카테고리 삭제</button>
+                        {
+                            data.map((article,index) => 
+                                <div key={index}>
+                                    {article.TITLE} / {article.CONTENT} / {article.CATEGORY}
+                                </div>
+                            )
+                        }
                     </div>
                 )
+                
+                
+                    
+                
             }
         </>
     );

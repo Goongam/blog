@@ -15,6 +15,7 @@ function NewArticle({categoryList}){
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
     const [selectedCate, setSelectedCate] = useState("");
+    const [titleBorderColor, setTitleBorderColor] = useState('black');
 
     const createArticle = useMutation(async ()=> await (await fetch("http://localhost:3001/NewArticle", {
       method: "POST",
@@ -35,13 +36,18 @@ function NewArticle({categoryList}){
       onError: ()=>{console.log('생성실패')}
     })
 
+    function submit(){
+      if(title === '') setTitleBorderColor('red');
+      else createArticle.mutate();
+    }
+
 
     return (
         <>
             {/*Memo를 사용한 input rerender방지*/}
             {/* <input type="text" onChange={(e)=>{setTitle(e.target.value)}}></input><br></br> */}
             {/* <textarea value={content} onChange={(e)=>{setContent(e.target.value)}}></textarea><br></br> */}
-            <InputTitleMemo setTitle={setTitle} title={title} />
+            <InputTitleMemo setTitle={setTitle} title={title} titleBorderColor={titleBorderColor} setTitleBorderColor={setTitleBorderColor}/>
             <InputContentMemo setContent={setContent} content={content} />
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Category</InputLabel>
@@ -54,22 +60,23 @@ function NewArticle({categoryList}){
               >
                 
                 {
+                  categoryList === undefined ? '' :
                   categoryList.map( (category,index)=>
                     <MenuItem key={index} value={category.CATEGORY}>{category.CATEGORY}</MenuItem>)
                 }
 
               </Select>
             </FormControl>
-            <button onClick={createArticle.mutate}>입력</button>
+            <button onClick={submit}>입력</button>
         </>
     );
 }
 
 const InputTitleMemo = memo(InputTitle);
-function InputTitle({setTitle, title}){
+function InputTitle({setTitle, title, titleBorderColor, setTitleBorderColor}){
   console.log('t render')
   return (<>
-    <input type="text" value={title} onChange={(e)=>{setTitle(e.target.value)}}></input><br></br>
+    <input style={{'borderColor': titleBorderColor}} type="text" value={title} onChange={(e)=>{setTitleBorderColor('black'); setTitle(e.target.value)}}></input><br></br>
   </>);
 }
 
