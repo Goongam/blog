@@ -9,22 +9,22 @@ function Article(){
 
 
     const {data,isError,isLoading} = useQuery(['article',articleid],
-                                async ()=> await (await fetch(`http://localhost:3001/GetArticleContent/${articleid}`)).json(),
-                                {
-                                    staleTime: 0, //fetch쿨타임 시간(ms)
-                                    onSuccess: async(d)=>{
-                                        console.log("성공");
-                        
-                                    },
-                                    onError:(error)=>{
-                                        console.log("에러코드:"+error.response?.data.code);
-                                    },
-                                    // enabled: false //true상태일때만 실행
-                                    retry: 3, //재시도횟수
-                                    refetchOnMount: true, //쿨타임끝일때 자동 마운팅
-                                    refetchOnWindowFocus: false, //쿨타임끝일때 윈도우 포커스 잡힐경우 자동 마운팅
-                        
-                                });
+            async ()=> await (await fetch(`http://localhost:3001/GetArticleContent/${articleid}`)).json(),
+            {
+                staleTime: 0, //fetch쿨타임 시간(ms)
+                onSuccess: async(d)=>{
+                    console.log("성공");
+    
+                },
+                onError:(error)=>{
+                    console.log("에러코드:"+error.response?.data.code);
+                },
+                // enabled: false //true상태일때만 실행
+                retry: 3, //재시도횟수
+                refetchOnMount: true, //쿨타임끝일때 자동 마운팅
+                refetchOnWindowFocus: false, //쿨타임끝일때 윈도우 포커스 잡힐경우 자동 마운팅
+    
+            });
 
 
 

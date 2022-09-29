@@ -28,6 +28,10 @@ function ArticleList(){
     )
     console.log('ArticleList render');
 
+    function getBetweenTime(EDITDATE){
+        return  ((new Date()).getTime() - new Date(EDITDATE).getTime()) / (1000 * 60 * 60)
+    }
+
 //sx={{ mb: 1.5 }} 타이포그래피 하단 간격
     return (
         <>
@@ -52,15 +56,25 @@ function ArticleList(){
                                         {article.TITLE}
                                     </Typography>
 
-                                    <Box sx={{ display: 'grid', gridAutoColumns: '1fr' }}>
+                                    <Box>
                                         <Typography sx={{gridRow:'1', gridColumn:'1/10'}} color="text.secondary">
                                             {article.CONTENT.length < 30 ? 
                                                 article.CONTENT : 
                                                 article.CONTENT.substr(0,28)+"..."
                                             }
                                         </Typography>
-                                        <Box color="text.secondary" sx={{gridRow:'2', gridColumn:'9/10'}}>
-                                            {article.EDITDATE.substr(0, article.EDITDATE.length - 14)}
+                                        <Box color="text.secondary" display="flex" justifyContent="flex-end">
+
+                                            { 
+                                                //현재시각 - 글 생성시각 < 24시간
+                                                getBetweenTime(article.EDITDATE) < 24 ? //24시간 이내
+                                                    +getBetweenTime(article.EDITDATE) < 1 ? //1시간 이내
+                                                        Math.floor(+getBetweenTime(article.EDITDATE) * 60)+ "분 전":
+                                                        Math.floor(+getBetweenTime(article.EDITDATE))+"시간 전":
+                                                        article.EDITDATE.substr(0, article.EDITDATE.length - 14)
+                                            }
+       
+
                                         </Box>
                                     </Box>
                                 </CardContent>
