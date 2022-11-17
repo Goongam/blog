@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import ArticleInList from "./ArticleInList";
 
 function ArticlesOfCategory({categoryRefetch}){
 
@@ -40,11 +41,7 @@ function ArticlesOfCategory({categoryRefetch}){
                     <div>
                         <button onClick={deleteEvent}>이 카테고리 삭제</button>
                         {
-                            data.map((article,index) => 
-                                <div key={index}>
-                                    {article.TITLE} / {article.CONTENT} / {article.CATEGORY}
-                                </div>
-                            )
+                            data.map((article,index) => <ArticleInList article={article} index={index} /> )
                         }
                     </div>
                 )
