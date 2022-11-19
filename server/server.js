@@ -2,12 +2,15 @@ const express = require("express");
 const app = express();
 const cors = require('cors');
 const oracledb = require('oracledb');
+const fs = require('fs');
+const multer = require('multer')
+const path=require("path");
 
 app.use(cors({ 
     origin: '*',
 }));
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: false }));
 
 
 let connection;
@@ -172,6 +175,31 @@ app.get('/deleteCategory/:category', async (req, res)=>{
     const result = await deleteCategory(req.params.category);
     res.send(result)
 })
+
+
+const upload = multer({
+    storage: multer.diskStorage({ // 저장한공간 정보 : 하드디스크에 저장
+        destination(req, file, done) { // 저장 위치
+            done(null, '../../imgs/'); // uploads라는 폴더 안에 저장
+        },
+        filename(req, file, done) { // 파일명을 어떤 이름으로 올릴지
+            const ext = path.extname(file.originalname);
+            done(null, file.fieldname + '-' + Date.now() + ext);
+        }
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5메가로 용량 제한
+});
+app.post('/uploadImage', upload.single('image'), async(req,res)=>{
+    res.send({imgURL:"http://localhost:3001/Image/"+req.file.filename});
+});
+
+app.get('/Image/:img', async(req, res)=>{
+    fs.readFile(`../../imgs/${req.params.img}`,(err,data)=>{
+        if(err) {res.send();}
+        res.send(data);
+    });
+});
+
 
 app.listen(3001, function(){
     console.log("start!!");
