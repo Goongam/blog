@@ -183,6 +183,7 @@ const upload = multer({
             done(null, '../../imgs/'); // uploads라는 폴더 안에 저장
         },
         filename(req, file, done) { // 파일명을 어떤 이름으로 올릴지
+            // console.log(file.originalname);
             const ext = path.extname(file.originalname);
             done(null, file.fieldname + '-' + Date.now() + ext);
         }
