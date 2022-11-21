@@ -3,7 +3,8 @@ const app = express();
 const cors = require('cors');
 const oracledb = require('oracledb');
 const fs = require('fs');
-const multer = require('multer')
+const multer = require('multer');
+const multiparty = require('multiparty');
 const path=require("path");
 
 app.use(cors({ 
@@ -183,7 +184,6 @@ const upload = multer({
             done(null, '../../imgs/'); // uploads라는 폴더 안에 저장
         },
         filename(req, file, done) { // 파일명을 어떤 이름으로 올릴지
-            // console.log(file.originalname);
             const ext = path.extname(file.originalname);
             done(null, file.fieldname + '-' + Date.now() + ext);
         }
@@ -201,6 +201,11 @@ app.get('/Image/:img', async(req, res)=>{
     });
 });
 
+app.post('/TestNewArticle',async (req,res)=>{
+    // const msg = await insertArticle(req.body.title, req.body.content, req.body.category);
+    console.log(req.body.content);
+    // res.send(msg);
+ });
 
 app.listen(3001, function(){
     console.log("start!!");
