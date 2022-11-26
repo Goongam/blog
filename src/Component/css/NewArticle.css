@@ -1,0 +1,26 @@
+.new_article_title{
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.quill  .ql-container {
+    /* height: 100px; */
+    min-height: 100px;
+    margin-bottom: 20px;
+    
+}
+
+
+.quill.error > .ql-toolbar {
+    border-bottom: 1px solid red;
+}
+.quill.error > .ql-container {
+    border-left: 1px solid red;
+    border-right: 1px solid red;
+    border-bottom: 1px solid red;
+}
+  
+/* 
+#submit{
+    justify-content: end;
+} */

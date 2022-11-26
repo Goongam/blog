@@ -1,12 +1,14 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, memo, useRef } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useParams, useNavigate } from "react-router-dom";
+import 'react-quill/dist/quill.snow.css';
+import ReactQuill from "react-quill";
 
 function Article(){
 
     const articleid = useParams().articleid;
     const Nevigate = useNavigate();
-
+    const contentRef = useRef();
 
     const {data,isError,isLoading} = useQuery(['article',articleid],
             async ()=> await (await fetch(`http://localhost:3001/GetArticleContent/${articleid}`)).json(),
@@ -47,7 +49,12 @@ function Article(){
             data.msg === 'No Article'? 'NO POST':
                 <div>
                     <p>{data.TITLE}</p>
-                    <p>{data.CONTENT}</p>
+                    {/* <div className="article_content" dangerouslySetInnerHTML={{__html:data.CONTENT}}>{data.CONTENT}</div> */}
+                    <ReactQuill 
+                        value={data.CONTENT}
+                        readOnly={true}
+                        theme={"bubble"}
+                    />
                     <p>카테고리:{data.CATEGORY === null ? "(카테고리 없음)" : data.CATEGORY}</p>
                     <button onClick={()=>{deleteArticle.mutate(articleid)}}>글 삭제</button>
                 </div>

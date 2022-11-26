@@ -6,6 +6,9 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { useMutation } from "react-query";
 import { useNavigate } from "react-router-dom";
+import TextEditor from "./TextEditor";
+import './css/NewArticle.css';
+import { Button, Box } from "@mui/material";
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 function NewArticle({categoryList}){
@@ -15,7 +18,8 @@ function NewArticle({categoryList}){
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
     const [selectedCate, setSelectedCate] = useState("");
-    const [titleBorderColor, setTitleBorderColor] = useState('black');
+    const [isTitleError, setIsTitleError] = useState(false);
+    const [isContentError, setIsContentError] = useState(false);
 
     const createArticle = useMutation(async ()=> await (await fetch("http://localhost:3001/NewArticle", {
       method: "POST",
@@ -30,25 +34,37 @@ function NewArticle({categoryList}){
       
     })).json(),{
       onSuccess: (e)=>{
-        console.log("생성성공");
+        if(e.error){
+          console.log(e.error);
+          return;
+        }
+        console.log("생성성공",e);
         Nevigate(`/Article/${e.id}`);
       },
       onError: ()=>{console.log('생성실패')}
     })
 
-    function submit(){
-      if(title === '') setTitleBorderColor('red');
-      else createArticle.mutate();
+    const submit = async ()=>{
+      // if(selectedCate === ''){setcategoryBorderColor('red'); return;}
+      if(title === '') {
+        setIsTitleError(true);
+        return;
+      }
+      if(content === ''){
+        setIsContentError(true);
+        return;
+      }
+      
+      createArticle.mutate();
     }
-
 
     return (
         <>
             {/*Memo를 사용한 input rerender방지*/}
             {/* <input type="text" onChange={(e)=>{setTitle(e.target.value)}}></input><br></br> */}
             {/* <textarea value={content} onChange={(e)=>{setContent(e.target.value)}}></textarea><br></br> */}
-            <InputTitleMemo setTitle={setTitle} title={title} titleBorderColor={titleBorderColor} setTitleBorderColor={setTitleBorderColor}/>
-            <InputContentMemo setContent={setContent} content={content} />
+            <InputTitleMemo setTitle={setTitle} title={title} isTitleError={isTitleError} setisTitleError={setIsTitleError}/>
+            <InputContentMemo setContent={setContent} content={content} isContentError={isContentError} setIsContentError={setIsContentError}/>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Category</InputLabel>
               <Select
@@ -67,26 +83,26 @@ function NewArticle({categoryList}){
 
               </Select>
             </FormControl>
-            <button onClick={submit}>입력</button>
+            <Box display="flex" sx={{mt:2}}>
+              <Button variant="contained" onClick={submit} sx={{ml:'auto'}}>작성</Button>
+            </Box>
         </>
     );
 }
 
 const InputTitleMemo = memo(InputTitle);
-function InputTitle({setTitle, title, titleBorderColor, setTitleBorderColor}){
+function InputTitle({setTitle, title, isTitleError,setisTitleError}){
   console.log('t render')
   return (<>
-    <input style={{'borderColor': titleBorderColor}} type="text" value={title} onChange={(e)=>{setTitleBorderColor('black'); setTitle(e.target.value)}}></input><br></br>
+    <TextField error={isTitleError} value={title} onChange={(e)=>{setisTitleError(false); setTitle(e.target.value)}} className="new_article_title"></TextField><br></br>
   </>);
 }
 
 const InputContentMemo = memo(InputContent);
-console.log('c redere');
-function InputContent({setContent, content}){
+function InputContent({setContent, content, isContentError, setIsContentError}){
+  console.log("content")
   return (
-    <>
-      <textarea value={content} onChange={(e)=>{setContent(e.target.value)}}></textarea><br></br>
-    </>
+    <TextEditor isContentError={isContentError} setIsContentError={setIsContentError} contents={content} setContents={setContent}/>
   );
 }
 
