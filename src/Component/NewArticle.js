@@ -63,7 +63,7 @@ function NewArticle({categoryList}){
             {/*Memo를 사용한 input rerender방지*/}
             {/* <input type="text" onChange={(e)=>{setTitle(e.target.value)}}></input><br></br> */}
             {/* <textarea value={content} onChange={(e)=>{setContent(e.target.value)}}></textarea><br></br> */}
-            <InputTitleMemo setTitle={setTitle} title={title} isTitleError={isTitleError} setisTitleError={setIsTitleError}/>
+            <InputTitleMemo setTitle={setTitle} title={title} isTitleError={isTitleError} setisTitleError={setIsTitleError} sx={{mb:1}} />
             <InputContentMemo setContent={setContent} content={content} isContentError={isContentError} setIsContentError={setIsContentError}/>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Category</InputLabel>

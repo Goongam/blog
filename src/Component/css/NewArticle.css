@@ -5,9 +5,12 @@
 
 .quill  .ql-container {
     /* height: 100px; */
-    min-height: 100px;
+    min-height: 300px;
     margin-bottom: 20px;
-    
+}
+
+.quill .ql-toolbar{
+    margin-top: 20px;
 }
 
 

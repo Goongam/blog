@@ -25,8 +25,8 @@ function ArticleInList({article, index}){
                             <Box>
                                 <Typography sx={{gridRow:'1', gridColumn:'1/10'}} color="text.secondary">
                                     {article.CONTENT.length < 30 ? 
-                                        article.CONTENT : 
-                                        article.CONTENT.substr(0,28)+"..."
+                                        article.CONTENT.replace(/(<([^>]+)>)/gi, "") : 
+                                        article.CONTENT.replace(/(<([^>]+)>)/gi, "").substr(0,28)+"..."
                                     }
                                 </Typography>
                                 <Box color="text.secondary" display="flex" justifyContent="flex-end">
