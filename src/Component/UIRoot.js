@@ -127,7 +127,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   const addcate = useMutation(async (value)=>await (await fetch(`http://localhost:3001/newCategory/${value}`)).json(),{
     onSuccess:()=>{
       console.log('카테고리 추가 성공');
-      catelistQuery.refetch();
+      catelistQuery.refetch(); //queryClient.invalidateQueries 사용?
+      
     },
     onError:(e)=>{
       console.log('카테고리 추가 에러 발생:'+e);

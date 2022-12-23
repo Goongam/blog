@@ -21,6 +21,8 @@ function NewArticle({categoryList}){
     const [isTitleError, setIsTitleError] = useState(false);
     const [isContentError, setIsContentError] = useState(false);
 
+    //TODO:
+    //FIXME: 
     const createArticle = useMutation(async ()=> await (await fetch("http://localhost:3001/NewArticle", {
       method: "POST",
       headers: {
@@ -35,13 +37,13 @@ function NewArticle({categoryList}){
     })).json(),{
       onSuccess: (e)=>{
         if(e.error){
-          console.log(e.error);
+          console.log("생성실패",e.error);
           return;
         }
         console.log("생성성공",e);
         Nevigate(`/Article/${e.id}`);
       },
-      onError: ()=>{console.log('생성실패')}
+      onError: ()=>{console.log('서버에러')}
     })
 
     const submit = async ()=>{

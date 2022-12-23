@@ -41,7 +41,7 @@ function ArticlesOfCategory({categoryRefetch}){
                     <div>
                         <button onClick={deleteEvent}>이 카테고리 삭제</button>
                         {
-                            data.map((article,index) => <ArticleInList article={article} index={index} /> )
+                            data.map((article,index) => <ArticleInList article={article} index={index} key={index} /> )
                         }
                     </div>
                 )

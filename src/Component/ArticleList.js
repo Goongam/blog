@@ -34,7 +34,7 @@ function ArticleList(){
             <List>
                 <button onClick={()=>{refetch()}}>새로고침</button>
             {data.map(
-                (article, index)=> <ArticleInList article={article} index={index}/> 
+                (article, index)=> <ArticleInList article={article} index={index} key={index}/> 
             )}
           
         </List>

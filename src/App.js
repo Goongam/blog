@@ -12,7 +12,7 @@ import {
 } from 'react-query'
 
 import css from './App.css';
-
+import { ReactQueryDevtools } from 'react-query/devtools'
 
 const queryClient = new QueryClient();
 
@@ -26,6 +26,7 @@ const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <UIRoot></UIRoot>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

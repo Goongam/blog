@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 
 function ArticleInList({article, index}){
     const navigater = useNavigate();
-
+    const CONTENT = article.CONTENT.replace(/(<([^>]+)>)/gi, "");
     function getBetweenTime(EDITDATE){
         return  ((new Date()).getTime() - new Date(EDITDATE).getTime()) / (1000 * 60 * 60)
     }
 
-    return <div key={index}>          
-                <ListItem key={index}>
+    return <div>          
+                <ListItem>
                 
                     {/* <ListItemText primary={article.TITLE} /> */}
                     <Card sx={{ minWidth: 1/1, p:0, m:0 }}>
@@ -24,9 +24,9 @@ function ArticleInList({article, index}){
 
                             <Box>
                                 <Typography sx={{gridRow:'1', gridColumn:'1/10'}} color="text.secondary">
-                                    {article.CONTENT.length < 30 ? 
-                                        article.CONTENT.replace(/(<([^>]+)>)/gi, "") : 
-                                        article.CONTENT.replace(/(<([^>]+)>)/gi, "").substr(0,28)+"..."
+                                    {CONTENT.length < 30 ? 
+                                        CONTENT : 
+                                        CONTENT.substr(0,28)+"..."
                                     }
                                 </Typography>
                                 <Box color="text.secondary" display="flex" justifyContent="flex-end">
