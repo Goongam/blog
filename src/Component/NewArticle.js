@@ -1,19 +1,17 @@
-import { useEffect, useState, memo } from "react";
+import { useState, memo } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { useMutation } from "react-query";
-import { useNavigate } from "react-router-dom";
 import TextEditor from "./TextEditor";
 import './css/NewArticle.css';
 import { Button, Box } from "@mui/material";
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { useNewArticle } from "./hooks/useNewArticle";
+import { useCategoryList } from "./hooks/useCategoryList";
 
-function NewArticle({categoryList}){
-
-    const Nevigate = useNavigate();
+function NewArticle(){
 
     const [title,setTitle] =  useState("");
     const [content, setContent] = useState("");
@@ -21,30 +19,8 @@ function NewArticle({categoryList}){
     const [isTitleError, setIsTitleError] = useState(false);
     const [isContentError, setIsContentError] = useState(false);
 
-    //TODO:
-    //FIXME: 
-    const createArticle = useMutation(async ()=> await (await fetch("http://localhost:3001/NewArticle", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        "title":title,
-        "content":content,
-        "category":selectedCate,
-      }),
-      
-    })).json(),{
-      onSuccess: (e)=>{
-        if(e.error){
-          console.log("생성실패",e.error);
-          return;
-        }
-        console.log("생성성공",e);
-        Nevigate(`/Article/${e.id}`);
-      },
-      onError: ()=>{console.log('서버에러')}
-    })
+    const createArticle = useNewArticle(title, content, selectedCate);
+    const { data: categoryList } = useCategoryList();
 
     const submit = async ()=>{
       // if(selectedCate === ''){setcategoryBorderColor('red'); return;}

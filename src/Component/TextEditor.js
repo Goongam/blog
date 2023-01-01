@@ -3,6 +3,7 @@ import { useState, useRef, useMemo, createElement } from "react";
 
 import 'react-quill/dist/quill.snow.css';
 // import './css/textEditor.css';
+import { baseUrl } from "../constants";
 
 
 function TextEditor({isContentError, setIsContentError, setContents, contents}){
@@ -31,7 +32,7 @@ function TextEditor({isContentError, setIsContentError, setContents, contents}){
             console.log(file[0]);  
         //   url = "http://localhost:3001/imgs";
        
-            url = await fetch('http://localhost:3001/uploadImage',{
+            url = await fetch(`${baseUrl}/uploadImage`,{
                 method: 'POST',
                 body: formData,
             }).then((data)=>data.json())

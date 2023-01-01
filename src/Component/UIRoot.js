@@ -22,6 +22,7 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import TextField from '@mui/material/TextField';
 
+import { baseUrl } from "../constants";
 
 import {
   BrowserRouter as Router,
@@ -33,7 +34,7 @@ import {
 import {
   useQuery,
   useMutation,
-  QueryClient,
+  useQueryClient,
 } from 'react-query'
 
 
@@ -42,9 +43,11 @@ import NewArticle from './NewArticle';
 import Article from './Article';
 import ArticleList from './ArticleList';
 import ArticlesOfCategory from './ArticlesOfCategory';
+import { useCategoryList } from './hooks/useCategoryList';
+import { useAddCategory } from './hooks/useAddCategory';
 
 
-const queryClient = new QueryClient();
+
 
 
 const drawerWidth = 240;
@@ -96,25 +99,14 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
  function App() {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const queryClient = useQueryClient();
 
+  const [open, setOpen] = React.useState(false);
   const [isCateInput, setIsCateInput] = React.useState(false);
 
 
 
-  const catelistQuery = useQuery('categoryList',async()=> await (await fetch("http://localhost:3001/GetCategoryList")).json(),{
-      onSuccess: async(d)=>{
-        console.log(d);
-
-      },
-      onError:(error)=>{
-          console.log("에러코드:"+error.response?.data.code);
-      },
-      // enabled: false //true상태일때만 실행
-      retry: 3, //재시도횟수
-      refetchOnMount: true, //쿨타임끝일때 자동 마운팅
-      refetchOnWindowFocus: false, //쿨타임끝일때 윈도우 포커스 잡힐경우 자동 마운팅
-    });
+  const { data: categoryList } = useCategoryList();
 
 
   function addCategoryClickEvent(e){
@@ -124,20 +116,12 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   
   }
 
-  const addcate = useMutation(async (value)=>await (await fetch(`http://localhost:3001/newCategory/${value}`)).json(),{
-    onSuccess:()=>{
-      console.log('카테고리 추가 성공');
-      catelistQuery.refetch(); //queryClient.invalidateQueries 사용?
-      
-    },
-    onError:(e)=>{
-      console.log('카테고리 추가 에러 발생:'+e);
-    }
-  });
+  const addcate = useAddCategory();
+  
   const addCategory = React.useCallback(async (value)=>{
-    const message = addcate.mutate(value);
+    addcate.mutate(value);
     setIsCateInput(false);
-  },[]);
+  },[addcate]);
  
 
 
@@ -218,11 +202,9 @@ const DrawerHeader = styled('div')(({ theme }) => ({
         </List>
         <Divider />
         <List>
-          {catelistQuery.isLoading ? 'Loading...':
-            catelistQuery.isError ? '서버와 연결할 수 없음':
-            <>
+          {<>
             {
-              catelistQuery.data.map((category, index) => (
+              categoryList.map((category, index) => (
               
                 <Link to={`/category/${category.CATEGORY}`} key={index}>
                   <ListItem key={index} disablePadding>
@@ -263,10 +245,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/NewArticle' element={<NewArticle categoryList={catelistQuery.data} />} />
+            <Route path='/NewArticle' element={<NewArticle />} />
             <Route path='/article/:articleid' element={<Article />} />
             <Route path='/ArticleList' element={<ArticleList />} />
-            <Route path='/Category/:category' element={<ArticlesOfCategory categoryRefetch={catelistQuery.refetch}/>} />
+            <Route path='/Category/:category' element={<ArticlesOfCategory />} />
           </Routes>
         
        

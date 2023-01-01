@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import UIRoot from './Component/UIRoot.js';
+import Loading from './Loading';
 
 import {
   useQuery,
@@ -14,7 +15,25 @@ import {
 import css from './App.css';
 import { ReactQueryDevtools } from 'react-query/devtools'
 
-const queryClient = new QueryClient();
+function queryErrorHandler(error){
+  console.log(error);
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      onError: queryErrorHandler,
+      staleTime: 600000,
+      cacheTime: 900000,
+      refetchOnMount: true,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      onError: queryErrorHandler,
+    },
+  },
+});
 
 
 
@@ -26,6 +45,7 @@ const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <UIRoot></UIRoot>
+      <Loading></Loading>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
