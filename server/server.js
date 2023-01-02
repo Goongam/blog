@@ -6,6 +6,11 @@ const fs = require('fs');
 const multer = require('multer');
 const multiparty = require('multiparty');
 const path=require("path");
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
+const { ok } = require("assert");
+
+dotenv.config();
 
 app.use(cors({ 
     origin: '*',
@@ -201,6 +206,89 @@ app.get('/Image/:img', async(req, res)=>{
     });
 });
 
+
+const users = [
+    {
+        id:'g1',
+        email:'aaa@gmail.com',
+        name:'goongam'
+    }
+];
+
+function createToken(user){
+    return jwt.sign(user, process.env.EXPRESS_SECRET,{
+        expiresIn: '15s', // 만료시간 15분
+        issuer: '토큰발급자',
+      });
+}
+
+app.get('/login', async (req, res)=>{
+    console.log(process.env.EXPRESS_SECRET);
+    const loginCheck = true;
+    const user = users[0];
+
+    if(!loginCheck) res.send({message:'login Failed'});
+
+    const accessToken = createToken(user);
+
+    res.send(
+        {
+            ok: true,
+            accessToken
+        }
+    );
+});
+
+const auth = (req, res, next) => {
+    // 인증 완료
+    try {
+        // 요청 헤더에 저장된 토큰(req.headers.authorization)과 비밀키를 사용하여 토큰을 req.decoded에 반환
+        req.decoded = jwt.verify(req.headers.authorization, process.env.EXPRESS_SECRET);
+        return next();
+    }
+    // 인증 실패
+    catch (error) {
+        // 유효시간이 초과된 경우
+        if (error.name === 'TokenExpiredError') {
+            return res.status(419).json({
+                code: 419,
+                message: '토큰이 만료되었습니다.',
+                ok: false,
+            });
+        }
+        // 토큰의 비밀키가 일치하지 않는 경우
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({
+                code: 401,
+                message: '유효하지 않은 토큰입니다.',
+                ok: false,
+            });
+        }
+    }
+}
+//TODO: Refresh방식 사용하기
+app.get('/user/:id',auth, async (req, res)=>{
+    
+    const id = req.params.id;
+    const user = users.find(user => user.id === id);
+    if(!user){
+        res.send({
+            ok: false,
+            msg: "해당 유저가 없습니다"
+        });
+        return;
+    }
+    console.log(user);
+    const accessToken = createToken(user);
+    res.send(
+        {
+            ok: true,
+            accessToken
+        }
+    );
+});
+
+
 app.post('/TestNewArticle',async (req,res)=>{
     // const msg = await insertArticle(req.body.title, req.body.content, req.body.category);
     console.log(req.body.content);
@@ -210,5 +298,7 @@ app.post('/TestNewArticle',async (req,res)=>{
 app.listen(3001, function(){
     console.log("start!!");
     connectDB();
+
+   
 });
 
