@@ -8,16 +8,30 @@ const multiparty = require('multiparty');
 const path=require("path");
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+
 const { ok } = require("assert");
 
 dotenv.config();
 
-app.use(cors({ 
-    origin: '*',
-}));
+const whitelist = ['http://localhost:3000'];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}
+app.use(cookieParser());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use(express.static(path.join(__dirname, 'public')));
 
 let connection;
 async function connectDB(){
@@ -222,19 +236,52 @@ function createToken(user){
       });
 }
 
+const token = {
+    getexpireTime: ()=>{
+        const expire = new Date();
+        return expire.setDate(Date.now() + 1000 * 60 * 10); //10분
+    },
+    accessToken: (user) => {
+        return jwt.sign(user, process.env.EXPRESS_SECRET,{
+            expiresIn: '15s', // 만료시간 15분
+            issuer: '토큰발급자',
+        });
+    },
+    refreshToken: (user) => {
+        return jwt.sign(user, process.env.EXPRESS_SECRET,{
+            expiresIn: '1h', // 만료시간 15분
+            issuer: '토큰발급자',
+        });
+    },
+    verifyRefresh: (token) => {
+        try {
+            jwt.verify(token, process.env.EXPRESS_SECRET);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+}
+
 app.get('/login', async (req, res)=>{
-    console.log(process.env.EXPRESS_SECRET);
+
     const loginCheck = true;
     const user = users[0];
 
     if(!loginCheck) res.send({message:'login Failed'});
 
-    const accessToken = createToken(user);
+    const refreshToken = token.refreshToken(user);
+    const accessToken = token.accessToken(user);
 
-    res.send(
+    res.cookie("refreshtoken", refreshToken,{
+        httpOnly: true,
+        // path:'/',
+        // expires: expire,
+    });
+    res.status(200).send(
         {
             ok: true,
-            accessToken
+            accessToken,
         }
     );
 });
@@ -250,25 +297,35 @@ const auth = (req, res, next) => {
     catch (error) {
         // 유효시간이 초과된 경우
         if (error.name === 'TokenExpiredError') {
-            return res.status(419).json({
-                code: 419,
-                message: '토큰이 만료되었습니다.',
-                ok: false,
-            });
+            if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
+                return next();
+            }else{  //
+                return res.status(419).json({
+                    code: 419,
+                    message: '토큰이 만료되었습니다. 다시 로그인 해주세요',
+                    ok: false,
+                });
+            }
+
+            
         }
         // 토큰의 비밀키가 일치하지 않는 경우
         if (error.name === 'JsonWebTokenError') {
-            return res.status(401).json({
-                code: 401,
-                message: '유효하지 않은 토큰입니다.',
-                ok: false,
-            });
+            if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
+                return next();
+            }else{  //
+                return res.status(401).json({
+                    code: 401,
+                    message: '유효하지 않은 토큰입니다. 다시 로그인 해주세요',
+                    ok: false,
+                });
+            }
+            
         }
     }
 }
-//TODO: Refresh방식 사용하기
+
 app.get('/user/:id',auth, async (req, res)=>{
-    
     const id = req.params.id;
     const user = users.find(user => user.id === id);
     if(!user){
@@ -278,7 +335,7 @@ app.get('/user/:id',auth, async (req, res)=>{
         });
         return;
     }
-    console.log(user);
+
     const accessToken = createToken(user);
     res.send(
         {
@@ -288,6 +345,12 @@ app.get('/user/:id',auth, async (req, res)=>{
     );
 });
 
+app.get('/logout', (req, res)=>{
+    res.cookie("refreshtoken", "",{
+        httpOnly: true,
+    });
+    res.send("logout!");
+})
 
 app.post('/TestNewArticle',async (req,res)=>{
     // const msg = await insertArticle(req.body.title, req.body.content, req.body.category);

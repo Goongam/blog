@@ -7,29 +7,30 @@ async function getUser(user){
         const res = await fetch(`${baseUrl}/user/g1`,{
             headers:{
                 authorization: user.accessToken
-            }
+            },
+            credentials: 'include',
         });
         return res.json();
     
 }
 
-function getStorageData(){
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
-}
+// function getStorageData(){
+//     const storedUser = localStorage.getItem('user');
+//     return storedUser ? JSON.parse(storedUser) : null;
+// }
 
 export function useUser(){
-    const { data } = useQuery(['user'], ()=>getUser(data),{
-        initialData: getStorageData,
-        onSuccess: (received) => {
-            if (!received) {
-            //   clearStoredUser();
-            } else {
-                localStorage.setItem("user",JSON.stringify(received));
-            }
-        },
-        staleTime:0,
-        refetchOnWindowFocus:true,
+    const { data = {} } = useQuery(['user'], ()=>getUser(data),{
+        // initialData: getStorageData,
+        // onSuccess: (received) => {
+        //     if (!received) {
+        //     //   clearStoredUser();
+        //     } else {
+        //         localStorage.setItem("user",JSON.stringify(received));
+        //     }
+        // },
+        staleTime:100,
+        refetchOnWindowFocus:false,
         refetchOnMount: true,
     });
     
