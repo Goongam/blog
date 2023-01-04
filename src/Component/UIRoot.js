@@ -45,7 +45,8 @@ import ArticleList from './ArticleList';
 import ArticlesOfCategory from './ArticlesOfCategory';
 import { useCategoryList } from './hooks/useCategoryList';
 import { useAddCategory } from './hooks/useAddCategory';
-
+import { Header } from '../UI/Header';
+import { Login } from './Login';
 
 
 
@@ -149,20 +150,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
       <Router>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Goongam Blog
-          </Typography>
-        </Toolbar>
+        <Header open={open} handleDrawerOpen={handleDrawerOpen}/>
       </AppBar>
       <Drawer
         sx={{
@@ -249,6 +237,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
             <Route path='/article/:articleid' element={<Article />} />
             <Route path='/ArticleList' element={<ArticleList />} />
             <Route path='/Category/:category' element={<ArticlesOfCategory />} />
+            <Route path='/login' element={<Login />} />
           </Routes>
         
        

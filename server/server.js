@@ -225,7 +225,8 @@ const users = [
     {
         id:'g1',
         email:'aaa@gmail.com',
-        name:'goongam'
+        name:'goongam',
+        password:'p1'
     }
 ];
 
@@ -243,32 +244,38 @@ const token = {
     },
     accessToken: (user) => {
         return jwt.sign(user, process.env.EXPRESS_SECRET,{
-            expiresIn: '15s', // 만료시간 15분
+            expiresIn: '5s', // 만료시간
             issuer: '토큰발급자',
         });
     },
     refreshToken: (user) => {
         return jwt.sign(user, process.env.EXPRESS_SECRET,{
-            expiresIn: '1h', // 만료시간 15분
+            expiresIn: '15s', // 만료시간
             issuer: '토큰발급자',
         });
     },
     verifyRefresh: (token) => {
         try {
-            jwt.verify(token, process.env.EXPRESS_SECRET);
-            return true;
+            const data = jwt.verify(token, process.env.EXPRESS_SECRET);
+            return data;
         } catch (error) {
             return false;
         }
     }
 }
 
-app.get('/login', async (req, res)=>{
+app.post('/login', async (req, res)=>{
 
-    const loginCheck = true;
-    const user = users[0];
+    const email = req.body.email;
+    const password = req.body.password;
 
-    if(!loginCheck) res.send({message:'login Failed'});
+    const user = users.find( (user) => {
+        console.log(user);
+        return user.email === email && user.password === password;
+      });
+    console.log(user);
+
+    if(!user) return res.send({message:'login Failed', ok:false});
 
     const refreshToken = token.refreshToken(user);
     const accessToken = token.accessToken(user);
@@ -282,67 +289,87 @@ app.get('/login', async (req, res)=>{
         {
             ok: true,
             accessToken,
+            user,
         }
     );
 });
 
-const auth = (req, res, next) => {
-    // 인증 완료
+app.get('/userAccess', async (req, res)=>{
     try {
-        // 요청 헤더에 저장된 토큰(req.headers.authorization)과 비밀키를 사용하여 토큰을 req.decoded에 반환
-        req.decoded = jwt.verify(req.headers.authorization, process.env.EXPRESS_SECRET);
-        return next();
+        // accessToken의 유효 확인
+        const userData = jwt.verify(req.headers.authorization, process.env.EXPRESS_SECRET);
+
+        const user = users.find(user => user.id === userData.id);
+        if(!user){
+            return res.status(420).json({
+                code: 419,
+                message: '잘못된 로그인 정보.',
+                ok: false,
+            });
+        }
+
+        //accessToken 연장 후 return
+        const accessToken = createToken(user);
+        res.send(
+            {
+                ok: true,
+                accessToken,
+                user,
+            }
+        );
+        
     }
-    // 인증 실패
+    // accessToken 만료 시
     catch (error) {
+        
         // 유효시간이 초과된 경우
-        if (error.name === 'TokenExpiredError') {
-            if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
-                return next();
-            }else{  //
+        if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+
+            //refreshToken 유효 확인
+            const userData = token.verifyRefresh(req.cookies.refreshtoken);
+
+            //refresh토큰이 유효하지 않은경우
+            if(!userData){
                 return res.status(419).json({
                     code: 419,
-                    message: '토큰이 만료되었습니다. 다시 로그인 해주세요',
+                    message: '토큰이 만료되거나 유효하지 않은 토큰 입니다. 다시 로그인 해주세요',
                     ok: false,
                 });
             }
-
-            
-        }
-        // 토큰의 비밀키가 일치하지 않는 경우
-        if (error.name === 'JsonWebTokenError') {
-            if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
-                return next();
-            }else{  //
-                return res.status(401).json({
-                    code: 401,
-                    message: '유효하지 않은 토큰입니다. 다시 로그인 해주세요',
+            //user정보가 없는 경우
+            const user = users.find(user => user.id === userData.id);
+            if(!user){
+                return res.status(420).json({
+                    code: 419,
+                    message: '잘못된 로그인 정보.',
                     ok: false,
                 });
             }
             
-        }
+            //accessToken 연장 후 return
+            const accessToken = createToken(user);
+            res.send(
+                {
+                    ok: true,
+                    accessToken,
+                    user,
+                }
+            );
+        }  
     }
-}
-
-app.get('/user/:id',auth, async (req, res)=>{
-    const id = req.params.id;
-    const user = users.find(user => user.id === id);
-    if(!user){
-        res.send({
-            ok: false,
-            msg: "해당 유저가 없습니다"
-        });
-        return;
-    }
-
-    const accessToken = createToken(user);
-    res.send(
-        {
-            ok: true,
-            accessToken
-        }
-    );
+        // // 토큰의 비밀키가 일치하지 않는 경우
+        // if () {
+        //     if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
+        //         return next();
+        //     }else{  //
+        //         return res.status(401).json({
+        //             code: 401,
+        //             message: '유효하지 않은 토큰입니다. 다시 로그인 해주세요',
+        //             ok: false,
+        //         });
+        //     }
+            
+        // }
 });
 
 app.get('/logout', (req, res)=>{

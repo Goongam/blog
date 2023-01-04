@@ -4,7 +4,7 @@ import { baseUrl } from '../../constants';
 async function getUser(user){
     
         console.log(user);
-        const res = await fetch(`${baseUrl}/user/g1`,{
+        const res = await fetch(`${baseUrl}/userAccess`,{
             headers:{
                 authorization: user.accessToken
             },
@@ -14,13 +14,9 @@ async function getUser(user){
     
 }
 
-// function getStorageData(){
-//     const storedUser = localStorage.getItem('user');
-//     return storedUser ? JSON.parse(storedUser) : null;
-// }
 
 export function useUser(){
-    const { data = {} } = useQuery(['user'], ()=>getUser(data),{
+    const { data = {}, refetch } = useQuery(['user'], ()=>getUser(data),{
         // initialData: getStorageData,
         // onSuccess: (received) => {
         //     if (!received) {
@@ -34,5 +30,5 @@ export function useUser(){
         refetchOnMount: true,
     });
     
-    return { data };
+    return { data, refetch };
 }

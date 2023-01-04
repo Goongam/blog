@@ -10,6 +10,7 @@ import { Button, Box } from "@mui/material";
 // import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { useNewArticle } from "./hooks/useNewArticle";
 import { useCategoryList } from "./hooks/useCategoryList";
+import { useUser } from "./hooks/useUser";
 
 function NewArticle(){
 
@@ -35,6 +36,8 @@ function NewArticle(){
       
       createArticle.mutate();
     }
+
+    useUser();
 
     return (
         <>
