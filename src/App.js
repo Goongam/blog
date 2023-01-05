@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       onError: queryErrorHandler,
-      staleTime: 600000,
+      staleTime: 0,
       cacheTime: 900000,
       refetchOnMount: true,
       refetchOnReconnect: false,

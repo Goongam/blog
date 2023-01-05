@@ -128,6 +128,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
 
   const functionList = [
+    {"name":'홈', 'link':''},
     {"name":'글 쓰기', 'link':'NewArticle'},
     {'name':'글 목록', 'link':'ArticleList'}
   ];

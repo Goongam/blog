@@ -48,7 +48,7 @@ function TextEditor({isContentError, setIsContentError, setContents, contents}){
 
                 quill?.clipboard.dangerouslyPasteHTML(
                     range,
-                    `<img src=${url}/>`
+                    `<img src=${url} crossOrigin="" />`
                 );
             }
             return ;

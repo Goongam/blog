@@ -38,7 +38,7 @@ export function Header({open, handleDrawerOpen}){
         {
             user.ok ? 
                 <Box>
-                    {user.user.id}
+                    {user.user.name}
                     <Button color="info" variant="contained" sx={{ml:2}}
                         onClick={()=>{
                             queryClient.setQueryData(['user'], {
