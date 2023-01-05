@@ -230,6 +230,11 @@ const users = [
     }
 ];
 
+function getUserRemovePassword(user){
+    const { password, ...cleanUser } = user;
+    return cleanUser;
+}
+
 function createToken(user){
     return jwt.sign(user, process.env.EXPRESS_SECRET,{
         expiresIn: '15s', // 만료시간 15분
@@ -244,13 +249,13 @@ const token = {
     },
     accessToken: (user) => {
         return jwt.sign(user, process.env.EXPRESS_SECRET,{
-            expiresIn: '5s', // 만료시간
+            expiresIn: '1h', // 만료시간
             issuer: '토큰발급자',
         });
     },
     refreshToken: (user) => {
         return jwt.sign(user, process.env.EXPRESS_SECRET,{
-            expiresIn: '15s', // 만료시간
+            expiresIn: '24h', // 만료시간
             issuer: '토큰발급자',
         });
     },
@@ -270,15 +275,15 @@ app.post('/login', async (req, res)=>{
     const password = req.body.password;
 
     const user = users.find( (user) => {
-        console.log(user);
         return user.email === email && user.password === password;
       });
-    console.log(user);
 
     if(!user) return res.send({message:'login Failed', ok:false});
 
-    const refreshToken = token.refreshToken(user);
-    const accessToken = token.accessToken(user);
+    const cleanUser = getUserRemovePassword(user);
+
+    const refreshToken = token.refreshToken(cleanUser);
+    const accessToken = token.accessToken(cleanUser);
 
     res.cookie("refreshtoken", refreshToken,{
         httpOnly: true,
@@ -289,7 +294,7 @@ app.post('/login', async (req, res)=>{
         {
             ok: true,
             accessToken,
-            user,
+            user: cleanUser,
         }
     );
 });
@@ -308,13 +313,15 @@ app.get('/userAccess', async (req, res)=>{
             });
         }
 
+        const cleanUser = getUserRemovePassword(user);
+
         //accessToken 연장 후 return
-        const accessToken = createToken(user);
+        const accessToken = createToken(cleanUser);
         res.send(
             {
                 ok: true,
                 accessToken,
-                user,
+                user: cleanUser,
             }
         );
         
@@ -336,9 +343,9 @@ app.get('/userAccess', async (req, res)=>{
                     ok: false,
                 });
             }
-            //user정보가 없는 경우
+            
             const user = users.find(user => user.id === userData.id);
-            if(!user){
+            if(!user){//user정보가 없는 경우
                 return res.status(420).json({
                     code: 419,
                     message: '잘못된 로그인 정보.',
@@ -346,30 +353,19 @@ app.get('/userAccess', async (req, res)=>{
                 });
             }
             
+            const cleanUser = getUserRemovePassword(user);
             //accessToken 연장 후 return
-            const accessToken = createToken(user);
+            const accessToken = createToken(cleanUser);
             res.send(
                 {
                     ok: true,
                     accessToken,
-                    user,
+                    user: cleanUser,
                 }
             );
         }  
     }
-        // // 토큰의 비밀키가 일치하지 않는 경우
-        // if () {
-        //     if(token.verifyRefresh(req.cookies.refreshtoken)){//refresh토큰이 유효한 경우
-        //         return next();
-        //     }else{  //
-        //         return res.status(401).json({
-        //             code: 401,
-        //             message: '유효하지 않은 토큰입니다. 다시 로그인 해주세요',
-        //             ok: false,
-        //         });
-        //     }
-            
-        // }
+
 });
 
 app.get('/logout', (req, res)=>{

@@ -42,8 +42,8 @@ export function Login(){
 
     const queryClient = useQueryClient();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState("aaa@gmail.com");
+    const [password, setPassword] = useState('p1');
 
     const navigate = useNavigate();
 

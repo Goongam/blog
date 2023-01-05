@@ -28,6 +28,7 @@ export function useUser(){
         staleTime:100,
         refetchOnWindowFocus:false,
         refetchOnMount: true,
+        refetchInterval: 1000 * 60 * 30 //30분 마다 재발급
     });
     
     return { data, refetch };
