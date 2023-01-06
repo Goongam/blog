@@ -1,5 +1,6 @@
 import List from '@mui/material/List';
-import { useState, useEffect, memo } from 'react';
+import { memo } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import ArticleInList from './ArticleInList.js'
 
@@ -7,21 +8,28 @@ import { useAllArticleList } from './hooks/useAllArticleList.js';
 
 function ArticleList(){
 
-   const { data: articleList , refetch} = useAllArticleList();
+   const { data: articleList , fetchNextPage, hasNextPage, isLoading, refetch} = useAllArticleList();
 
-//sx={{ mb: 1.5 }} 타이포그래피 하단 간격
+   if(isLoading) return <>Loading...</>;
+
     return (
         <>
-        
-        <List>
-            <button onClick={()=>{refetch()}}>새로고침</button>
-            {articleList.map(
-                (article, index)=> <ArticleInList article={article} index={index} key={index}/> 
-            )}
-          
-        </List>
-        
+        <InfiniteScroll loadMore={fetchNextPage} hasMore={hasNextPage}>
+            <List>
+                <button onClick={()=>{refetch()}}>새로고침</button>
+                {
+                articleList.pages.map(
+                    (pageData) =>
+                    pageData.data.map((article, index) => 
+                        <ArticleInList article={article} index={index} key={index}/> 
+                    )
+                )
+                
+                }
             
+            </List>
+        
+        </InfiniteScroll>
         </>
     );
 }

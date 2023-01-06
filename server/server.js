@@ -71,10 +71,19 @@ async function insertArticle(title, content,category){
     }
 }
 //
-async function getArticles(){
+
+async function getArticles(page){
+    const PAGENUM = 10;
+    const SELECT_ALL_ARTICLE = "select * from ( select ROW_NUMBER () OVER (order by editdate desc) num, id,title,content,editdate from Articles order by editdate desc ) where num BETWEEN :1 AND :2";
+
+    const start = (page-1) * PAGENUM + 1;
+    const end = page * PAGENUM + 1;
     try {
-        const articleList = await connection.execute("select id,title,content,editdate from Articles order by editdate desc");
-        return articleList.rows;
+        const articleList = await connection.execute(SELECT_ALL_ARTICLE, [start, end]);
+        return {
+            data: articleList.rows.slice(0, PAGENUM),
+            next: articleList.rows[PAGENUM] ? (+page + 1) : "",
+        };
 
     } catch (error) {
         console.log('getArticles ',error);
@@ -106,11 +115,20 @@ async function getArticleContent(id){
     }
 }
 
-async function getCategoryArticle(category){
+//TODO: pagenation
+async function getCategoryArticle(category, page){
     try {
-        const articleList = await connection.execute('select * from Articles where category = :category',[category]);
-        // console.log(articleList.rows);
-        return articleList.rows;
+        const PAGENUM = 10;
+        const SELECT_ARTICLE_WITH_CATEGORY = "select * from ( select ROW_NUMBER () OVER (order by editdate desc) num, id,title,content,editdate from Articles where category = :1 order by editdate desc ) where num BETWEEN :2 AND :3";
+
+        const start = (page-1) * PAGENUM + 1;
+        const end = page * PAGENUM + 1;
+
+        const articleList = await connection.execute(SELECT_ARTICLE_WITH_CATEGORY,[category, start, end]);
+        return {
+            data: articleList.rows.slice(0, PAGENUM),
+            next: articleList.rows[PAGENUM] ? (+page + 1) : "",
+        };
     } catch (error) {
         console.log('getCategoryArticle ',error);
         return {"error" : "SELECT Error3"};
@@ -161,8 +179,10 @@ app.post('/NewArticle',async (req,res)=>{
    res.send(msg);
 });
 
-app.get('/GetArticleList',async (req,res)=>{
-    const result =  await getArticles();
+app.get('/GetArticleList/:page',async (req,res)=>{
+    const page = req.params.page;
+
+    const result =  await getArticles(page);
     res.send(result);
 });
 app.get('/GetCategoryList', async (req,res)=>{
@@ -187,8 +207,9 @@ app.get('/newCategory/:category',async (req,res)=>{
     res.send(result);
 });
 
-app.get('/Category/:category',async (req,res)=>{
-    const result = await getCategoryArticle(req.params.category);
+app.get('/Category/:category/:page',async (req,res)=>{
+    const page = req.params.page;
+    const result = await getCategoryArticle(req.params.category, page);
     res.send(result);
 });
 
