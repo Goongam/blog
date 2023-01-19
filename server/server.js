@@ -172,6 +172,21 @@ async function deleteCategory(category){
     }
 }
 
+async function modifyArticle(req, res){
+
+    try {
+        await connection.execute('update articles set title = :1, content = :2, category = :3 where id = :4',[req.body.title,req.body.content,req.body.category,req.body.id]);
+        await connection.commit();
+        res.send({'msg': 'update success'});
+    } catch (error) {
+        res.send({'error': error});
+    }
+
+}
+
+
+app.post('/ModifyArticle', modifyArticle);
+
 app.post('/NewArticle',async (req,res)=>{
    const msg = await insertArticle(req.body.title, req.body.content, req.body.category);
 

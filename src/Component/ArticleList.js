@@ -16,7 +16,7 @@ function ArticleList(){
         <>
         <InfiniteScroll loadMore={fetchNextPage} hasMore={hasNextPage}>
             <List>
-                <button onClick={()=>{refetch()}}>새로고침</button>
+                {/* <button onClick={()=>{refetch()}}>새로고침</button> */}
                 {
                 articleList.pages.map(
                     (pageData) =>

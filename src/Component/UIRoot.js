@@ -47,7 +47,7 @@ import { useCategoryList } from './hooks/useCategoryList';
 import { useAddCategory } from './hooks/useAddCategory';
 import { Header } from '../UI/Header';
 import { Login } from './Login';
-
+import ModifyArticle from './ModifyArticle';
 
 
 
@@ -239,6 +239,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
             <Route path='/ArticleList' element={<ArticleList />} />
             <Route path='/Category/:category' element={<ArticlesOfCategory />} />
             <Route path='/login' element={<Login />} />
+            <Route path='/editArticle/:articleid' element={<ModifyArticle />} /> 
           </Routes>
         
        

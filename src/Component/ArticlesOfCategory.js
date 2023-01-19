@@ -25,7 +25,7 @@ function ArticlesOfCategory(){
             <InfiniteScroll loadMore={fetchNextPage} hasMore={hasNextPage}>
                 <Button onClick={deleteEvent}>이 카테고리 삭제</Button>
             <List>
-                <button onClick={()=>{refetch()}}>새로고침</button>
+                {/* <button onClick={()=>{refetch()}}>새로고침</button> */}
                 {
                 articleList.pages.map(
                     (pageData) =>
