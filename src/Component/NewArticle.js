@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useEffect } from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -12,6 +12,7 @@ import { useNewArticle } from "./hooks/useNewArticle";
 import { useCategoryList } from "./hooks/useCategoryList";
 import { useUser } from "./hooks/useUser";
 import NewArticleForm from "./NewArticleForm";
+import { useNavigate } from "react-router-dom";
 
 function NewArticle(){
 
@@ -25,7 +26,15 @@ function NewArticle(){
       createArticle.mutate();
     }
 
-    useUser();
+    const {data: user} = useUser();
+
+    const navi = useNavigate();
+    //Cannot update a component (`BrowserRouter`) while rendering a different component 에러 => useEffect
+    useEffect(()=>{
+      if(!user.ok) navi('/login'); 
+    },[navi, user]);
+    
+
 
     return (
         <NewArticleForm 

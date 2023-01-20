@@ -11,7 +11,7 @@ import { Button, Box } from "@mui/material";
 
 const InputTitleMemo = memo(InputTitle);
 function InputTitle({setTitle, title, isTitleError,setisTitleError}){
-  console.log('t render',title);
+
   return (<>
     <TextField error={isTitleError} value={title} onChange={(e)=>{setisTitleError(false); setTitle(e.target.value)}} className="new_article_title"></TextField><br></br>
   </>);
@@ -19,7 +19,7 @@ function InputTitle({setTitle, title, isTitleError,setisTitleError}){
 
 const InputContentMemo = memo(InputContent);
 function InputContent({setContent, content, isContentError, setIsContentError}){
-  console.log("content")
+
   return (
     <TextEditor isContentError={isContentError} setIsContentError={setIsContentError} contents={content} setContents={setContent}/>
   );

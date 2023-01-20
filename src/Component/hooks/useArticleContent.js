@@ -6,6 +6,7 @@ export function useArticleContent(articleid){
         TITLE:"",
         CONTENT:"",
         CATEGORY:"",
+        EDITDATE:"",
     };
 
     const {data = fallback} = useQuery(['article',articleid],

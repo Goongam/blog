@@ -1,9 +1,8 @@
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { baseUrl } from '../../constants';
 
 async function getUser(user){
     
-        console.log(user);
         const res = await fetch(`${baseUrl}/userAccess`,{
             headers:{
                 authorization: user.accessToken
@@ -16,6 +15,10 @@ async function getUser(user){
 
 
 export function useUser(){
+
+    const queryClient = useQueryClient();
+    const user = queryClient.getQueryData('user');
+
     const { data = {}, refetch } = useQuery(['user'], ()=>getUser(data),{
         // initialData: getStorageData,
         // onSuccess: (received) => {
@@ -28,8 +31,10 @@ export function useUser(){
         staleTime:100,
         refetchOnWindowFocus:false,
         refetchOnMount: true,
-        refetchInterval: 1000 * 60 * 30 //30분 마다 재발급
+        refetchInterval: 1000 * 60 * 30, //30분 마다 재발급
+        enabled: !!user?.ok,
     });
+
     
     return { data, refetch };
 }

@@ -104,7 +104,7 @@ async function getCategoryList(){
 async function getArticleContent(id){
     try {
         const articleContent = await connection.execute(
-            "select title,content,category from Articles where id = :id",[id]
+            "select title,content,category,editdate from Articles where id = :id",[id]
         );
         if(articleContent.rows.length === 0) return {"msg" : "No Article"};
 
@@ -115,7 +115,6 @@ async function getArticleContent(id){
     }
 }
 
-//TODO: pagenation
 async function getCategoryArticle(category, page){
     try {
         const PAGENUM = 10;

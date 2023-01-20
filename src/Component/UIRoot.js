@@ -48,6 +48,7 @@ import { useAddCategory } from './hooks/useAddCategory';
 import { Header } from '../UI/Header';
 import { Login } from './Login';
 import ModifyArticle from './ModifyArticle';
+import { useUser } from './hooks/useUser';
 
 
 
@@ -105,7 +106,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   const [open, setOpen] = React.useState(false);
   const [isCateInput, setIsCateInput] = React.useState(false);
 
-
+  const { data: user } = useUser();
 
   const { data: categoryList } = useCategoryList();
 
@@ -145,7 +146,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   };
 
   // const categoryMemo = React.useMemo(()=> [...categorys], [categorys]);
-  console.log('App render')
   return (
     <Box sx={{ display: 'flex' }}>
       <Router>
@@ -210,9 +210,9 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 
           <ListItem>
               {
-                isCateInput ? 
+                isCateInput && user.ok ? 
                   <TextField 
-                    inputRef={input => {return input && input.focus();}} 
+                    inputRef={input =>  {return input && input.focus();}} 
                     onBlur={()=>{setIsCateInput(false)}}
                     onKeyDown={addCategoryClickEvent}
                     id="standard-basic" label="카테고리 입력" variant="standard" /> 

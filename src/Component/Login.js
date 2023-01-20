@@ -64,7 +64,7 @@ export function Login(){
 
                                 if(accessToken.ok){
                                     queryClient.setQueryData(['user'], accessToken);
-                                    navigate('/');
+                                    navigate(-1);
                                 }else{
                                     console.log('로그인 실패');
                                 }

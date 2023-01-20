@@ -7,6 +7,7 @@ import { baseUrl } from "../constants";
 import { useArticleContent } from "./hooks/useArticleContent";
 import { useDeleteArticle } from "./hooks/useDeleteArticle";
 import { Box, Button } from "@mui/material";
+import { useUser } from "./hooks/useUser";
 
 function Article(){
 
@@ -21,7 +22,7 @@ function Article(){
 
     const deleteArticle = useDeleteArticle();
 
-    
+    const { data: user } = useUser();
 
     return (
         <>
@@ -37,6 +38,9 @@ function Article(){
                         theme={"bubble"}
                     />
                     <p>
+                        {data.EDITDATE.substr(0, data.EDITDATE.length - 14)}
+                    </p>
+                    <p>
                         {
                         data.CATEGORY === null ? 
                             "(카테고리 없음)" : 
@@ -47,21 +51,25 @@ function Article(){
                     </p>
 
 
-                    <Box color="text.secondary" display="flex" justifyContent="flex-end">
-                        <Button 
-                            onClick={()=>{navi(`/editArticle/${articleid}`)}} 
-                            variant="contained" 
-                            color="secondary">
-                                글 수정
-                        </Button>
-                        <Button 
-                            onClick={()=>{deleteArticle.mutate(articleid)}} 
-                            variant="contained" 
-                            color="error"
-                            sx={{ml:1}}>
-                                글 삭제
-                        </Button>
-                    </Box>
+                    {
+                        !user.ok || (
+                            <Box color="text.secondary" display="flex" justifyContent="flex-end">
+                                <Button 
+                                    onClick={()=>{navi(`/editArticle/${articleid}`)}} 
+                                    variant="contained" 
+                                    color="secondary">
+                                        글 수정
+                                </Button>
+                                <Button 
+                                    onClick={()=>{deleteArticle.mutate(articleid)}} 
+                                    variant="contained" 
+                                    color="error"
+                                    sx={{ml:1}}>
+                                        글 삭제
+                                </Button>
+                            </Box>
+                        )
+                    }
                 </div>
             }
         </>
